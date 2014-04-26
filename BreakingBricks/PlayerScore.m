@@ -11,7 +11,7 @@
 @implementation PlayerScore
 
 
-// add some custom classes to increment the score
+// I want to overwrite this class (SKLabel) so that I can add methods to change the label text from a method.
 
 
 

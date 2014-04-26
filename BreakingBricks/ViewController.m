@@ -11,21 +11,30 @@
 
 @implementation ViewController
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
 
+-(void)viewWillLayoutSubviews {
+    // putting all the view code in here and removing viewDidLoad to support landscape orientation
+    
     // Configure the view.
     SKView * skView = (SKView *)self.view;
     skView.showsFPS = YES;
     skView.showsNodeCount = YES;
     
-    // Create and configure the scene.
-    SKScene * scene = [MyScene sceneWithSize:skView.bounds.size];
-    scene.scaleMode = SKSceneScaleModeAspectFill;
+    if (!skView.scene ) {
+        // only create scene if there is not yet a scene object
+        // this is necessary because viewWillLayoutSubviews is
+        // called multiple times in the app lifecycle
+        
+        // Create and configure the scene.
+        // Create and configure the scene.
+        SKScene * scene = [MyScene sceneWithSize:skView.bounds.size];
+        scene.scaleMode = SKSceneScaleModeAspectFill;
+        
+        // Present the scene.
+        [skView presentScene:scene];
+        
+    }
     
-    // Present the scene.
-    [skView presentScene:scene];
 }
 
 
@@ -33,10 +42,7 @@
     return YES;
 }
 
-- (BOOL)shouldAutorotate
-{
-    return YES;
-}
+
 
 - (NSUInteger)supportedInterfaceOrientations
 {

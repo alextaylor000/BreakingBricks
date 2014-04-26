@@ -66,6 +66,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     }
     
     if (notTheBall.categoryBitMask == brickCategory) {
+        NSLog(@"Brick hit");
         [self runAction:soundBrickHit];
         [notTheBall.node removeFromParent];
     }
@@ -76,8 +77,8 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     }
     
     if (notTheBall.categoryBitMask == bottomEdgeCategory) {
-        EndScene *end = [EndScene sceneWithSize:self.size];
-        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
+//        EndScene *end = [EndScene sceneWithSize:self.size];
+//        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
         
     }
     
@@ -109,7 +110,6 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     
     // add physics body to ball
     ball.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:ball.frame.size.width/2];
-    
     // reduce friction
     // describes the energy lost when objects slide against each other
     ball.physicsBody.friction = 0;
@@ -126,7 +126,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     //  collides with another
     
     //  this is a percentage of how much energy is lost when collision occurs
-    ball.physicsBody.restitution = 1.0;
+    ball.physicsBody.restitution = 0;
     
     // set categories
     ball.physicsBody.categoryBitMask = ballCategory;
@@ -170,19 +170,32 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
 }
 
 
-- (void) addBricks:(CGSize)size {
-    for (int i = 0; i < 4; i++) {
+- (void) addBricks:(CGSize)size numberOfBricks:(NSInteger)numBricks startingAt:(CGPoint)brickPos {
+    // adds x number of bricks starting at anchor point x
+    
+    for (int i = 0; i < numBricks; i++) {
+        
         SKSpriteNode *brick = [SKSpriteNode spriteNodeWithImageNamed:@"brick"];
-        
-        brick.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:brick.frame.size];
+        // commented this out because I think it was interfering with the physics body
+        //brick.anchorPoint = CGPointMake(0, 0); // make the anchor point bottom-left instead of center
         brick.physicsBody.dynamic = NO;
+        brick.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:brick.size];
         brick.physicsBody.categoryBitMask = brickCategory;
+
+
+    
+        // place the brick
         
-        int xPos = size.width/5 * (i+1);
-        int yPos = size.height - 50;
+        brick.position = CGPointMake(brickPos.x + (brick.size.width / 2), brickPos.y);
         
-        brick.position = CGPointMake(xPos, yPos);
+        CGFloat brickWidth = brick.size.width;
+        
+        // update the position for the next brick
+        brickPos = CGPointMake( (brickPos.x + brickWidth + 5), brickPos.y);
+        
+        
         [self addChild:brick];
+        
         
     }
 }
@@ -239,6 +252,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
         
         // scene's physics body
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
+        self.physicsBody.friction = 0;
 
         // change gravity settings of the scene
         self.physicsWorld.gravity = CGVectorMake(0, 0);
@@ -266,7 +280,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
         
         [self addBall:size]; // size of scene
         [self addPlayer:size];
-        [self addBricks:size];
+        [self addBricks:size numberOfBricks:5 startingAt:CGPointMake(40, 200)]; // just test coords for now
         [self addBottomEdge:size];
         
     }

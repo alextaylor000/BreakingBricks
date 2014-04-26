@@ -56,6 +56,18 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
 }
 
 
+// Functions for random numbers
+static inline CGFloat skRandf() {
+    return rand() / (CGFloat) RAND_MAX;
+}
+
+static inline CGFloat skRand(CGFloat low, CGFloat high)
+{
+    return skRandf() * (high - low) + low;
+}
+
+
+
 
 // the contact methods are being provided by the delegate
 // which was delcared in the header
@@ -78,7 +90,12 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
         [notTheBall.node removeFromParent];
         
         // update score
-        [self updateScoreWithIncrement:1];
+        if ([notTheBall.node.name isEqual: @"brick.good"]) {
+            [self updateScoreWithIncrement:1];
+        } else if ([notTheBall.node.name isEqual:@"brick.bad"]) {
+            [self updateScoreWithIncrement:-1];
+        }
+
         
         
     }
@@ -207,7 +224,17 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     for (int i = 0; i < numBricks; i++) {
         
         SKSpriteNode *brick = [SKSpriteNode spriteNodeWithImageNamed:@"brick"];
-        brick.name = @"brick";
+        
+        // randomly throw in a "bad" brick
+        CGFloat random = skRand(0.0, 1.0);
+        
+        if (random <= 0.1) {
+            brick.name = @"brick.bad";
+        } else {
+            brick.name = @"brick.good";
+        }
+        
+
         
         // commented this out because I think it was interfering with the physics body
         //brick.anchorPoint = CGPointMake(0, 0); // make the anchor point bottom-left instead of center
@@ -231,10 +258,18 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
         
         // debug
         NSLog(@"Brick container size is %0fx%0f", brickContainer.frame.size.width, brickContainer.frame.size.height);
-        NSLog(@"(%i) Adding brick at %0f, %0f", i, brick.position.x, brick.position.y);
+        NSLog(@"(%i) Adding brick '%@' at %0f, %0f", i, brick.name, brick.position.x, brick.position.y);
         SKLabelNode *label = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
-        label.text = [NSString stringWithFormat:@"Brick %i", i] ;
-        label.fontColor = [SKColor whiteColor];
+        label.text = [NSString stringWithFormat:@"%@", brick.name] ;
+
+        if ([brick.name isEqual:@"brick.bad"]) {
+            label.fontColor = [SKColor redColor];
+            
+        } else  {
+            label.fontColor = [SKColor blueColor];
+        }
+        
+        
         label.fontSize = 10;
         label.position = CGPointMake(0, 0);
         [brick addChild:label];

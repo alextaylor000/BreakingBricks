@@ -77,8 +77,8 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     }
     
     if (notTheBall.categoryBitMask == bottomEdgeCategory) {
-//        EndScene *end = [EndScene sceneWithSize:self.size];
-//        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
+        EndScene *end = [EndScene sceneWithSize:self.size];
+        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
         
     }
     
@@ -104,7 +104,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     // create sprite
     SKSpriteNode *ball = [SKSpriteNode spriteNodeWithImageNamed:@"ball"];
     
-    CGPoint myPoint = CGPointMake(size.width/2, size.height/2);
+    CGPoint myPoint = CGPointMake(size.width/2, size.height - 75);
     //ball.size = CGSizeMake(27, 27);
     ball.position = myPoint;
     
@@ -131,6 +131,9 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     ball.physicsBody.restitution = 1;
     
     ball.physicsBody.angularDamping = 0;
+    
+    // prevents the ball from being affected by brick hits
+    ball.physicsBody.allowsRotation = NO;
     
     // set categories
     ball.physicsBody.categoryBitMask = ballCategory;
@@ -164,7 +167,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     [self addChild:ball];
     
     // add a vector to the ball
-    CGVector myVector = CGVectorMake(10, 10); // up and to the right
+    CGVector myVector = CGVectorMake(2, -10);
     [ball.physicsBody applyImpulse: myVector];
     
     // FORCE vs. IMPULSE
@@ -176,15 +179,20 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
 
 - (void) addBricks:(CGSize)size numberOfBricks:(NSInteger)numBricks startingAt:(CGPoint)brickPos {
     // adds x number of bricks starting at anchor point x
+
     
     for (int i = 0; i < numBricks; i++) {
         
         SKSpriteNode *brick = [SKSpriteNode spriteNodeWithImageNamed:@"brick"];
         // commented this out because I think it was interfering with the physics body
         //brick.anchorPoint = CGPointMake(0, 0); // make the anchor point bottom-left instead of center
+        brick.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:brick.frame.size];
         brick.physicsBody.dynamic = NO;
-        brick.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:brick.size];
         brick.physicsBody.categoryBitMask = brickCategory;
+        brick.physicsBody.friction = 0;
+        
+
+        
 
 
     
@@ -211,7 +219,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     self.paddle = [SKSpriteNode spriteNodeWithImageNamed:@"paddle"];
 
     
-    self.paddle.position = CGPointMake(size.width/2, 100.0);
+    self.paddle.position = CGPointMake(size.width/2, 50.0);
     self.paddle.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:self.paddle.frame.size];
     self.paddle.physicsBody.dynamic = NO;
     self.paddle.physicsBody.categoryBitMask = paddleCategory;
@@ -226,7 +234,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     
     for (UITouch *touch in touches) {
         CGPoint location = [touch locationInNode:self]; // where did this specific touch happen? (self refers to scene)
-        CGPoint newPosition = CGPointMake(location.x, 100);
+        CGPoint newPosition = CGPointMake(location.x, 50.0);
         
         // stop the paddle from moving too far
         // restrict its movement
@@ -285,7 +293,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
         
         [self addBall:size]; // size of scene
         [self addPlayer:size];
-        [self addBricks:size numberOfBricks:5 startingAt:CGPointMake(40, 200)]; // just test coords for now
+        [self addBricks:size numberOfBricks:6 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
         [self addBottomEdge:size];
         
     }

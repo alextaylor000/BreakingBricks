@@ -8,6 +8,7 @@
 
 #import "MyScene.h"
 #import "EndScene.h"
+#import "PlayerScore.h"
 
 @interface MyScene ()
 
@@ -49,7 +50,11 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     SKAction *soundBrickHit;
     
     SKSpriteNode *brickContainer; // make the brickContainer accessible so we can move it in the game loop
+    SKLabelNode *scoreLabel;
+    NSInteger currentScore;
+
 }
+
 
 
 // the contact methods are being provided by the delegate
@@ -71,6 +76,11 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     if (notTheBall.categoryBitMask == brickCategory) {
         [self runAction:soundBrickHit];
         [notTheBall.node removeFromParent];
+        
+        // update score
+        [self updateScoreWithIncrement:1];
+        
+        
     }
     
     if (notTheBall.categoryBitMask == paddleCategory) {
@@ -100,6 +110,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     [self addChild:bottomEdge];
     
 }
+
 
 - (void)addBall:(CGSize)size
 {
@@ -276,9 +287,28 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     
 }
 
--(id)initWithSize:(CGSize)size {    
+- (void)addScore:(CGSize)size withScore:(NSInteger)score {
+    scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
+    scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeRight;
+    scoreLabel.text = [NSString stringWithFormat:@"Score: %i", score];
+    scoreLabel.fontColor = [SKColor yellowColor];
+    scoreLabel.fontSize = 25;
+    scoreLabel.position = CGPointMake(self.frame.size.width - 10, 10);
+    [self addChild: scoreLabel];
+
+}
+
+- (void)updateScoreWithIncrement:(NSInteger)score {
+    currentScore = currentScore + score;
+    scoreLabel.text = [NSString stringWithFormat:@"Score: %i" , currentScore];
+}
+
+
+-(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
         /* Setup your scene here */
+        
+        currentScore = 0;
         
         /* Init sounds */
         soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
@@ -320,11 +350,17 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
         [self addBricks:size numberOfBricks:16 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
         [self addBottomEdge:size];
         
+        // add score
+        [self addScore:size withScore:currentScore];
+
+        
         // move the bricks
         SKAction *moveBricks = [SKAction moveByX:-10 y:0 duration:1.0];
         SKAction *moveBricksForever = [SKAction repeatActionForever:moveBricks];
         
         [brickContainer runAction:moveBricksForever];
+        
+    
         
         
     }

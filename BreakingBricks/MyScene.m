@@ -104,6 +104,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     SKSpriteNode *ball = [SKSpriteNode spriteNodeWithImageNamed:@"orb0000"];
     
     CGPoint myPoint = CGPointMake(size.width/2, size.height/2);
+    ball.size = CGSizeMake(27, 27);
     ball.position = myPoint;
     
     // add physics body to ball
@@ -191,6 +192,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     // create paddle
     // self.paddle ensures that the object will be assigned to the public property "paddle"
     self.paddle = [SKSpriteNode spriteNodeWithImageNamed:@"paddle"];
+
     
     self.paddle.position = CGPointMake(size.width/2, 100.0);
     self.paddle.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:self.paddle.frame.size];

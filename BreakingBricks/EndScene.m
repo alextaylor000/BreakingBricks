@@ -14,7 +14,7 @@
 - (instancetype)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
 
-        self.backgroundColor = [SKColor orangeColor];
+        self.backgroundColor = [SKColor redColor];
         
         SKAction *play = [SKAction playSoundFileNamed:@"gameover.caf" waitForCompletion:NO];
         [self runAction:play];
@@ -22,7 +22,7 @@
         
         SKLabelNode *label = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
         label.text = @"GAME OVER!";
-        label.fontColor = [SKColor yellowColor];
+        label.fontColor = [SKColor whiteColor];
         label.fontSize = 44;
         label.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame));
         [self addChild: label];
@@ -30,7 +30,7 @@
         
         SKLabelNode *tryAgain = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
         tryAgain.text = @"Play again?";
-        tryAgain.fontColor = [SKColor yellowColor];
+        tryAgain.fontColor = [SKColor whiteColor];
         tryAgain.fontSize = 26;
         tryAgain.position = CGPointMake(size.width/2, -50);
         

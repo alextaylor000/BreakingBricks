@@ -17,6 +17,7 @@
 
 
 
+
 @end
 
 // categories
@@ -46,6 +47,8 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
 @implementation MyScene {
     SKAction *soundPaddleHit;
     SKAction *soundBrickHit;
+    
+    SKSpriteNode *brickContainer; // make the brickContainer accessible so we can move it in the game loop
 }
 
 
@@ -66,7 +69,6 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     }
     
     if (notTheBall.categoryBitMask == brickCategory) {
-        NSLog(@"Brick hit");
         [self runAction:soundBrickHit];
         [notTheBall.node removeFromParent];
     }
@@ -179,34 +181,56 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
 
 - (void) addBricks:(CGSize)size numberOfBricks:(NSInteger)numBricks startingAt:(CGPoint)brickPos {
     // adds x number of bricks starting at anchor point x
-
+    
+    // create a container node to hold all the bricks so we can control the group's speed
+    brickContainer = [SKSpriteNode spriteNodeWithColor:[SKColor darkGrayColor] size:CGSizeMake(1, 1)]; // this doesn't need to be a size, the children can exceed its bounds
+    
+    
+    brickContainer.position = brickPos;
+    
+    [self addChild:brickContainer];
+    
+    brickPos = CGPointMake(0, 0); // reset the brickPos to be relative to the container
+    
     
     for (int i = 0; i < numBricks; i++) {
         
         SKSpriteNode *brick = [SKSpriteNode spriteNodeWithImageNamed:@"brick"];
+        brick.name = @"brick";
+        
         // commented this out because I think it was interfering with the physics body
         //brick.anchorPoint = CGPointMake(0, 0); // make the anchor point bottom-left instead of center
         brick.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:brick.frame.size];
         brick.physicsBody.dynamic = NO;
         brick.physicsBody.categoryBitMask = brickCategory;
         brick.physicsBody.friction = 0;
-        
-
-        
 
 
     
         // place the brick
         
-        brick.position = CGPointMake(brickPos.x + (brick.size.width / 2), brickPos.y);
+        
+        //brick.position = CGPointMake(brickPos.x + (brick.size.width/2), brickPos.y);
+        brick.position = CGPointMake(brickPos.x, brickPos.y);
         
         CGFloat brickWidth = brick.size.width;
         
         // update the position for the next brick
         brickPos = CGPointMake( (brickPos.x + brickWidth + 5), brickPos.y);
         
+        // debug
+        NSLog(@"Brick container size is %0fx%0f", brickContainer.frame.size.width, brickContainer.frame.size.height);
+        NSLog(@"(%i) Adding brick at %0f, %0f", i, brick.position.x, brick.position.y);
+        SKLabelNode *label = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
+        label.text = [NSString stringWithFormat:@"Brick %i", i] ;
+        label.fontColor = [SKColor whiteColor];
+        label.fontSize = 10;
+        label.position = CGPointMake(0, 0);
+        [brick addChild:label];
+
         
-        [self addChild:brick];
+        
+        [brickContainer addChild:brick];
         
         
     }
@@ -293,13 +317,31 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
         
         [self addBall:size]; // size of scene
         [self addPlayer:size];
-        [self addBricks:size numberOfBricks:6 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
+        [self addBricks:size numberOfBricks:16 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
         [self addBottomEdge:size];
+        
+        // move the bricks
+        SKAction *moveBricks = [SKAction moveByX:-10 y:0 duration:1.0];
+        SKAction *moveBricksForever = [SKAction repeatActionForever:moveBricks];
+        
+        [brickContainer runAction:moveBricksForever];
+        
         
     }
     return self;
 }
 
+
+- (void)didSimulatePhysics
+{
+    // remove bricks if they pass the left edge
+//    [self enumerateChildNodesWithName:@"brick" usingBlock:
+//     ^(SKNode *node, BOOL *stop) {
+//         if (node.position.x < (0 - (node.frame.size.width/2)))
+//
+//             [node removeFromParent];
+//     }];
+}
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */

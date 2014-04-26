@@ -31,7 +31,7 @@
         SKLabelNode *tryAgain = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
         tryAgain.text = @"Play again?";
         tryAgain.fontColor = [SKColor whiteColor];
-        tryAgain.fontSize = 25;
+        tryAgain.fontSize = 26;
         tryAgain.position = CGPointMake(size.width/2, -50);
         
         SKAction *moveLabel = [SKAction moveToY:(size.height/2 - 40) duration:0.4];

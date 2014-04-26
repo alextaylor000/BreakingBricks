@@ -21,7 +21,7 @@
         
         
         SKLabelNode *label = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
-        label.text = @"GAME OVER";
+        label.text = @"GAME OVER!";
         label.fontColor = [SKColor whiteColor];
         label.fontSize = 44;
         label.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame));
@@ -31,7 +31,7 @@
         SKLabelNode *tryAgain = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
         tryAgain.text = @"Play again?";
         tryAgain.fontColor = [SKColor whiteColor];
-        tryAgain.fontSize = 30;
+        tryAgain.fontSize = 25;
         tryAgain.position = CGPointMake(size.width/2, -50);
         
         SKAction *moveLabel = [SKAction moveToY:(size.height/2 - 40) duration:0.4];

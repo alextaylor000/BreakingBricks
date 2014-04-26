@@ -102,10 +102,10 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
 - (void)addBall:(CGSize)size
 {
     // create sprite
-    SKSpriteNode *ball = [SKSpriteNode spriteNodeWithImageNamed:@"orb0000"];
+    SKSpriteNode *ball = [SKSpriteNode spriteNodeWithImageNamed:@"ball"];
     
     CGPoint myPoint = CGPointMake(size.width/2, size.height/2);
-    ball.size = CGSizeMake(27, 27);
+    //ball.size = CGSizeMake(27, 27);
     ball.position = myPoint;
     
     // add physics body to ball
@@ -125,8 +125,12 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     // restitution = bounciness; how much energy is lost when an object
     //  collides with another
     
-    //  this is a percentage of how much energy is lost when collision occurs
-    ball.physicsBody.restitution = 0;
+    // setting this to 1 means NO energy is lost; e.g. after the bounce, it has
+    // THIS VALUE of its previous energy. so 100% means it has 100% of its
+    // previous energy
+    ball.physicsBody.restitution = 1;
+    
+    ball.physicsBody.angularDamping = 0;
     
     // set categories
     ball.physicsBody.categoryBitMask = ballCategory;
@@ -134,27 +138,27 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     // e.g. this line would disable collision for the paddle
     // ball.physicsBody.collisionBitMask = edgeCategory | brickCategory;
     
-    // create orb animation
-    SKTextureAtlas *orbAtlas = [SKTextureAtlas atlasNamed:@"orb"];
-    
-    // get image names and sort them
-    NSArray *orbImages = [orbAtlas textureNames];
-    NSArray *orbImagesSorted = [orbImages sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-    
-    // create an actual texture array
-    NSMutableArray *orbTextures = [NSMutableArray array];
-
-    for (NSString *filename in orbImagesSorted) {
-        SKTexture *texture = [orbAtlas textureNamed:filename];
-        [orbTextures addObject:texture];
-    }
-    
-    // create animation
-    SKAction *glow = [SKAction animateWithTextures:orbTextures timePerFrame:0.1];
-    
-    SKAction *keepGlowing = [SKAction repeatActionForever:glow];
-
-    [ball runAction:keepGlowing];
+//    // create orb animation
+//    SKTextureAtlas *orbAtlas = [SKTextureAtlas atlasNamed:@"orb"];
+//    
+//    // get image names and sort them
+//    NSArray *orbImages = [orbAtlas textureNames];
+//    NSArray *orbImagesSorted = [orbImages sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+//    
+//    // create an actual texture array
+//    NSMutableArray *orbTextures = [NSMutableArray array];
+//
+//    for (NSString *filename in orbImagesSorted) {
+//        SKTexture *texture = [orbAtlas textureNamed:filename];
+//        [orbTextures addObject:texture];
+//    }
+//    
+//    // create animation
+//    SKAction *glow = [SKAction animateWithTextures:orbTextures timePerFrame:0.1];
+//    
+//    SKAction *keepGlowing = [SKAction repeatActionForever:glow];
+//
+//    [ball runAction:keepGlowing];
     
     // add to scene
     [self addChild:ball];
@@ -255,6 +259,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
         self.physicsBody.friction = 0;
 
         // change gravity settings of the scene
+
         self.physicsWorld.gravity = CGVectorMake(0, 0);
             // 0, 0 = space
             // 0, -1.6 = moon

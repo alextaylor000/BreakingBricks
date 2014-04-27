@@ -43,6 +43,7 @@ static const uint32_t brickCategory     = 0x1 << 1; // set the first bit to 1, a
 static const uint32_t paddleCategory    = 0x1 << 2;
 static const uint32_t edgeCategory      = 0x1 << 3;
 static const uint32_t bottomEdgeCategory = 0x1 << 4;
+static const uint32_t brickBadCategory  = 0x1 << 5;
 
 
 @implementation MyScene {
@@ -50,6 +51,7 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
     SKAction *soundBrickHit;
     
     SKSpriteNode *brickContainer; // make the brickContainer accessible so we can move it in the game loop
+    SKSpriteNode *lastBrick ; // keep track of the last brick to know when to add more
     SKLabelNode *scoreLabel;
     NSInteger currentScore;
 
@@ -228,10 +230,12 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         // randomly throw in a "bad" brick
         CGFloat random = skRand(0.0, 1.0);
         
+        brick.name = @"brick";
+        
         if (random <= 0.1) {
-            brick.name = @"brick.bad";
+            brick.physicsBody.categoryBitMask = brickBadCategory;
         } else {
-            brick.name = @"brick.good";
+            brick.physicsBody.categoryBitMask = brickCategory;
         }
         
 
@@ -240,7 +244,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         //brick.anchorPoint = CGPointMake(0, 0); // make the anchor point bottom-left instead of center
         brick.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:brick.frame.size];
         brick.physicsBody.dynamic = NO;
-        brick.physicsBody.categoryBitMask = brickCategory;
+        
         brick.physicsBody.friction = 0;
 
 
@@ -278,6 +282,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         [brickContainer addChild:brick];
         
+        if (i == (numBricks - 1)) {
+            lastBrick = brick;
+        }
         
     }
 }
@@ -382,7 +389,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         //[self addBall:size]; // size of scene
         [self addPlayer:size];
-        [self addBricks:size numberOfBricks:16 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
+        [self addBricks:size numberOfBricks:2 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
         [self addBottomEdge:size];
         
         // add score
@@ -390,18 +397,29 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
         
         // move the bricks
-        SKAction *moveBricks = [SKAction moveByX:-10 y:0 duration:1.0];
+        SKAction *moveBricks = [SKAction moveByX:-15 y:0 duration:1.0];
         SKAction *moveBricksForever = [SKAction repeatActionForever:moveBricks];
         
         [brickContainer runAction:moveBricksForever];
         
-    
+
         
         
     }
     return self;
 }
+-(void)update:(CFTimeInterval)currentTime {
+    /* Called before each frame is rendered */
+}
 
+- (void)didEvaluateActions {
+
+    // track lastBrick's position relative to the scene
+    CGPoint lastBrickPositionInScene = [lastBrick.scene convertPoint:lastBrick.position fromNode:lastBrick.parent];
+    NSLog(@"brickContainer=%0.1f / lastBrickPosInScene=%0.1f", brickContainer.position.x, lastBrickPositionInScene.x);
+    //NSLog(@"lastBrick position x=%0.1f", lastBrickPositionInScene.x);
+    
+}
 
 - (void)didSimulatePhysics
 {
@@ -414,8 +432,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 //     }];
 }
 
--(void)update:(CFTimeInterval)currentTime {
-    /* Called before each frame is rendered */
-}
+
+
 
 @end

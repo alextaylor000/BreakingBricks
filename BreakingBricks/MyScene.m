@@ -429,7 +429,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 -(void)moveBricksInScene {
     // moves the brick container
-    moveBricks = [SKAction moveByX:-15 y:0 duration:1.0];
+    moveBricks = [SKAction moveByX:-80 y:0 duration:1.0];
     moveBricksForever = [SKAction repeatActionForever:moveBricks];
     
     [brickContainer runAction:moveBricksForever];
@@ -438,6 +438,15 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
+    // remove old bricks
+    [self enumerateChildNodesWithName:@"//brick" usingBlock:^(SKNode *node, BOOL *stop) {
+        CGPoint nodePositionInScene = [node.scene convertPoint:node.position fromNode:node.parent];
+        if (nodePositionInScene.x < (0 - (node.frame.size.width/2) )   ) {
+            NSLog(@"Removing brick");
+            [node removeFromParent];
+            // TODO: Even though we're removing bricks, the memory usage is still going up. Maybe we need to actually destroy them?
+        }
+    }];
 }
 
 
@@ -448,7 +457,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     // if lastBrick's position (its center) passes the right edge of the scene (defined by the scene width),
     // then we need to add more bricks
     CGPoint lastBrickPositionInScene = [lastBrick.scene convertPoint:lastBrick.position fromNode:lastBrick.parent];
-    NSLog(@"lastBrickPositionInScene x=%0.1f", lastBrickPositionInScene.x);
+    //NSLog(@"lastBrickPositionInScene x=%0.1f", lastBrickPositionInScene.x);
 
     if (lastBrickPositionInScene.x < self.frame.size.width) {
         NSLog(@"lastBrick is entering the scene space. Time to add more bricks!");

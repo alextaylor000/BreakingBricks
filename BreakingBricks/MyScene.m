@@ -47,11 +47,21 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
 
 
 @implementation MyScene {
+    // in-game sounds; alloc'd here so there's no pause when the sounds are loaded
     SKAction *soundPaddleHit;
     SKAction *soundBrickHit;
+
+    // action for moving bricks. this gets called during init AND during evaluateAction
+    SKAction *moveBricks;
+    SKAction *moveBricksForever;
     
-    SKSpriteNode *brickContainer; // make the brickContainer accessible so we can move it in the game loop
-    SKSpriteNode *lastBrick ; // keep track of the last brick to know when to add more
+    // make the brickContainer accessible so we can move it in the game loop
+    SKSpriteNode *brickContainer;
+
+    // keep track of the last brick to know when to add more
+    SKSpriteNode *lastBrick ;
+    
+    // score properties
     SKLabelNode *scoreLabel;
     NSInteger currentScore;
 
@@ -266,7 +276,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         SKLabelNode *label = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
         label.text = [NSString stringWithFormat:@"%@", brick.name] ;
 
-        if ([brick.name isEqual:@"brick.bad"]) {
+        if (brick.physicsBody.categoryBitMask == brickBadCategory) {
             label.fontColor = [SKColor redColor];
             
         } else  {
@@ -348,10 +358,12 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
+        
+
         /* Setup your scene here */
         
         currentScore = 0;
-        
+
         /* Init sounds */
         //soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
         //soundBrickHit = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
@@ -389,7 +401,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         //[self addBall:size]; // size of scene
         [self addPlayer:size];
-        [self addBricks:size numberOfBricks:2 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
+        [self addBricks:size numberOfBricks:10 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
         [self addBottomEdge:size];
         
         // add score
@@ -397,27 +409,45 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
         
         // move the bricks
-        SKAction *moveBricks = [SKAction moveByX:-15 y:0 duration:1.0];
-        SKAction *moveBricksForever = [SKAction repeatActionForever:moveBricks];
-        
-        [brickContainer runAction:moveBricksForever];
-        
-
+        [self moveBricksInScene];
         
         
     }
     return self;
 }
+
+-(void)moveBricksInScene {
+    // moves the brick container
+    moveBricks = [SKAction moveByX:-15 y:0 duration:1.0];
+    moveBricksForever = [SKAction repeatActionForever:moveBricks];
+    
+    [brickContainer runAction:moveBricksForever];
+    
+}
+
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
 }
 
+
+
 - (void)didEvaluateActions {
 
     // track lastBrick's position relative to the scene
+    // if lastBrick's position (its center) passes the right edge of the scene (defined by the scene width),
+    // then we need to add more bricks
     CGPoint lastBrickPositionInScene = [lastBrick.scene convertPoint:lastBrick.position fromNode:lastBrick.parent];
-    NSLog(@"brickContainer=%0.1f / lastBrickPosInScene=%0.1f", brickContainer.position.x, lastBrickPositionInScene.x);
-    //NSLog(@"lastBrick position x=%0.1f", lastBrickPositionInScene.x);
+    NSLog(@"lastBrickPositionInScene x=%0.1f", lastBrickPositionInScene.x);
+
+    if (lastBrickPositionInScene.x < self.frame.size.width) {
+        NSLog(@"lastBrick is entering the scene space. Time to add more bricks!");
+//        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake((lastBrickPositionInScene.x + lastBrick.size.width + 5), (self.size.height - 25))];
+        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake(40, (self.size.height - 50))];
+
+        // move the bricks
+        [self moveBricksInScene];
+
+    }
     
 }
 

@@ -16,9 +16,6 @@
 @property SKSpriteNode *paddle;
 
 
-
-
-
 @end
 
 // categories
@@ -70,6 +67,9 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
     NSTimeInterval startTime;
     NSTimeInterval elapsedTime;
     
+    // speed properties
+    CGFloat ballSpeed;
+    CGFloat bricksSpeed;
 
 }
 
@@ -223,7 +223,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     [self addChild:ball];
     
     // add a vector to the ball
-    CGVector myVector = CGVectorMake(2, -10);
+    CGVector myVector = CGVectorMake(2, ballSpeed);
     [ball.physicsBody applyImpulse: myVector];
     
     // FORCE vs. IMPULSE
@@ -381,6 +381,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         startTime = [NSDate timeIntervalSinceReferenceDate];
         elapsedTime = [NSDate timeIntervalSinceReferenceDate];
         
+        // set the initial speeds
+        ballSpeed = -10.0;
+        bricksSpeed = -15.0;
 
 
         /* Setup your scene here */
@@ -442,7 +445,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 -(void)moveBricksInScene {
     // moves the brick container
-    moveBricks = [SKAction moveByX:-30 y:0 duration:1.0];
+
+    moveBricks = [SKAction moveByX:bricksSpeed y:0 duration:1.0];
     moveBricksForever = [SKAction repeatActionForever:moveBricks];
     
     [brickContainer runAction:moveBricksForever];
@@ -465,6 +469,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
             // TODO: Even though we're removing bricks, the memory usage is still going up. Maybe we need to actually destroy them?
         }
     }];
+    
+
 }
 
 

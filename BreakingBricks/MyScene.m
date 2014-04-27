@@ -65,6 +65,11 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
     // score properties
     SKLabelNode *scoreLabel;
     NSInteger currentScore;
+    
+    // timer properties
+    NSTimeInterval startTime;
+    NSTimeInterval elapsedTime;
+    
 
 }
 
@@ -372,6 +377,11 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
         
+        // start the timers
+        startTime = [NSDate timeIntervalSinceReferenceDate];
+        elapsedTime = [NSDate timeIntervalSinceReferenceDate];
+        
+
 
         /* Setup your scene here */
         
@@ -441,6 +451,11 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
+    // get elapsed time
+    NSTimeInterval currentGameTime = [NSDate timeIntervalSinceReferenceDate];
+    elapsedTime = currentGameTime - startTime;
+    NSLog(@"elapsed time: %0.1f", elapsedTime);
+    
     // remove old bricks
     [self enumerateChildNodesWithName:@"//brick" usingBlock:^(SKNode *node, BOOL *stop) {
         CGPoint nodePositionInScene = [node.scene convertPoint:node.position fromNode:node.parent];

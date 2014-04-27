@@ -346,8 +346,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         currentScore = 0;
         
         /* Init sounds */
-        soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
-        soundBrickHit = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
+        //soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
+        //soundBrickHit = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
         
         self.backgroundColor = [SKColor blackColor];
         

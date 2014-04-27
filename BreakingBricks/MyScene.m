@@ -97,6 +97,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     } else {
         notTheBall = contact.bodyA;
     }
+
+    
     
     if (notTheBall.categoryBitMask == brickCategory) {
         [self runAction:soundBrickHit];
@@ -186,7 +188,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
     // set categories
     ball.physicsBody.categoryBitMask = ballCategory;
-    ball.physicsBody.contactTestBitMask = brickCategory | paddleCategory | bottomEdgeCategory; // brick, paddle or bottom edge category
+    ball.physicsBody.contactTestBitMask = brickCategory | brickBadCategory | paddleCategory | bottomEdgeCategory; // brick, paddle or bottom edge category
     // e.g. this line would disable collision for the paddle
     // ball.physicsBody.collisionBitMask = edgeCategory | brickCategory;
     
@@ -244,8 +246,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         SKSpriteNode *brick = [SKSpriteNode spriteNodeWithImageNamed:@"brick"];
         
-        // randomly throw in a "bad" brick
-        CGFloat random = skRand(0.0, 1.0);
         
         brick.name = @"brick";
         
@@ -258,6 +258,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         brick.physicsBody.dynamic = NO;
 
         brick.physicsBody.friction = 0;
+
+        // randomly throw in a "bad" brick
+        CGFloat random = skRand(0.0, 1.0);
 
 
         if (random <= 0.1) {
@@ -375,9 +378,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         currentScore = 0;
 
         /* Init sounds */
-        //soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
-        //soundBrickHit = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
-        //soundBrickHitBad = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
+        soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
+        soundBrickHit = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
+        soundBrickHitBad = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
         
         self.backgroundColor = [SKColor blackColor];
         
@@ -410,13 +413,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         self.physicsBody.categoryBitMask = edgeCategory;
         
         
-        //[self addBall:size]; // size of scene
+        [self addBall:size]; // size of scene
         [self addPlayer:size];
         [self addBricks:size numberOfBricks:10 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
         [self addBottomEdge:size];
         
         // add score
-        //[self addScore:size withScore:currentScore];
+        [self addScore:size withScore:currentScore];
 
         
         // move the bricks
@@ -429,7 +432,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 -(void)moveBricksInScene {
     // moves the brick container
-    moveBricks = [SKAction moveByX:-80 y:0 duration:1.0];
+    moveBricks = [SKAction moveByX:-30 y:0 duration:1.0];
     moveBricksForever = [SKAction repeatActionForever:moveBricks];
     
     [brickContainer runAction:moveBricksForever];

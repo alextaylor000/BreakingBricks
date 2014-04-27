@@ -50,6 +50,7 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
     // in-game sounds; alloc'd here so there's no pause when the sounds are loaded
     SKAction *soundPaddleHit;
     SKAction *soundBrickHit;
+    SKAction *soundBrickHitBad;
 
     // action for moving bricks. this gets called during init AND during evaluateAction
     SKAction *moveBricks;
@@ -100,17 +101,23 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     if (notTheBall.categoryBitMask == brickCategory) {
         [self runAction:soundBrickHit];
         [notTheBall.node removeFromParent];
-        
-        // update score
-        if ([notTheBall.node.name isEqual: @"brick.good"]) {
-            [self updateScoreWithIncrement:1];
-        } else if ([notTheBall.node.name isEqual:@"brick.bad"]) {
-            [self updateScoreWithIncrement:-1];
-        }
 
-        
+        // update score
+        [self updateScoreWithIncrement:1];
         
     }
+
+    
+    if (notTheBall.categoryBitMask == brickBadCategory) {
+        [self runAction:soundBrickHitBad];
+        [notTheBall.node removeFromParent];
+        
+        // update score
+        [self updateScoreWithIncrement:-1];
+        
+    }
+
+    
     
     if (notTheBall.categoryBitMask == paddleCategory) {
         
@@ -242,11 +249,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         brick.name = @"brick";
         
-        if (random <= 0.1) {
-            brick.physicsBody.categoryBitMask = brickBadCategory;
-        } else {
-            brick.physicsBody.categoryBitMask = brickCategory;
-        }
         
 
         
@@ -254,9 +256,15 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         //brick.anchorPoint = CGPointMake(0, 0); // make the anchor point bottom-left instead of center
         brick.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:brick.frame.size];
         brick.physicsBody.dynamic = NO;
-        
+
         brick.physicsBody.friction = 0;
 
+
+        if (random <= 0.1) {
+            brick.physicsBody.categoryBitMask = brickBadCategory;
+        } else {
+            brick.physicsBody.categoryBitMask = brickCategory;
+        }
 
     
         // place the brick
@@ -272,15 +280,17 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         // debug
         NSLog(@"Brick container size is %0fx%0f", brickContainer.frame.size.width, brickContainer.frame.size.height);
-        NSLog(@"(%i) Adding brick '%@' at %0f, %0f", i, brick.name, brick.position.x, brick.position.y);
+        NSLog(@"(%i) Adding brick '%@' at %0f, %0f with category %u", i, brick.name, brick.position.x, brick.position.y, brick.physicsBody.categoryBitMask);
         SKLabelNode *label = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
         label.text = [NSString stringWithFormat:@"%@", brick.name] ;
 
         if (brick.physicsBody.categoryBitMask == brickBadCategory) {
             label.fontColor = [SKColor redColor];
             
-        } else  {
+        } else if (brick.physicsBody.categoryBitMask == brickCategory)  {
             label.fontColor = [SKColor blueColor];
+        } else {
+            label.fontColor = [SKColor greenColor];
         }
         
         
@@ -367,6 +377,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         /* Init sounds */
         //soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
         //soundBrickHit = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
+        //soundBrickHitBad = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
         
         self.backgroundColor = [SKColor blackColor];
         
@@ -441,8 +452,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
     if (lastBrickPositionInScene.x < self.frame.size.width) {
         NSLog(@"lastBrick is entering the scene space. Time to add more bricks!");
-//        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake((lastBrickPositionInScene.x + lastBrick.size.width + 5), (self.size.height - 25))];
-        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake(40, (self.size.height - 50))];
+        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake((lastBrickPositionInScene.x + lastBrick.size.width + 5), (self.size.height - 25))];
+
 
         // move the bricks
         [self moveBricksInScene];

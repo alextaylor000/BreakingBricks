@@ -380,13 +380,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         self.physicsBody.categoryBitMask = edgeCategory;
         
         
-        [self addBall:size]; // size of scene
+        //[self addBall:size]; // size of scene
         [self addPlayer:size];
         [self addBricks:size numberOfBricks:16 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
         [self addBottomEdge:size];
         
         // add score
-        [self addScore:size withScore:currentScore];
+        //[self addScore:size withScore:currentScore];
 
         
         // move the bricks

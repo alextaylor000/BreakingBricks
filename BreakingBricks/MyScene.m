@@ -66,10 +66,15 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
     // timer properties
     NSTimeInterval startTime;
     NSTimeInterval elapsedTime;
+    NSTimeInterval lastLevelUpdate; // the time of the last level update, to make sure it only updates once per interval
     
     // speed properties
     CGFloat ballSpeed;
     CGFloat bricksSpeed;
+    
+    // difficulty properties
+    NSInteger levelUpdateInterval; // how many seconds to update the level
+    CGFloat levelDifficultyInterval; // percentage to increase speed by
 
 }
 
@@ -132,8 +137,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     }
     
     if (notTheBall.categoryBitMask == bottomEdgeCategory) {
-        EndScene *end = [EndScene sceneWithSize:self.size];
-        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
+//        EndScene *end = [EndScene sceneWithSize:self.size];
+//        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
         
     }
     
@@ -385,7 +390,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         ballSpeed = -10.0;
         bricksSpeed = -15.0;
 
-
+        // set the difficulty
+        levelUpdateInterval = 10;
+        levelDifficultyInterval = 0.1;
+        
         /* Setup your scene here */
         
         currentScore = 0;
@@ -458,7 +466,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     // get elapsed time
     NSTimeInterval currentGameTime = [NSDate timeIntervalSinceReferenceDate];
     elapsedTime = currentGameTime - startTime;
-    NSLog(@"elapsed time: %0.1f", elapsedTime);
+    NSLog(@"elapsed time: %i", (int)elapsedTime);
     
     // remove old bricks
     [self enumerateChildNodesWithName:@"//brick" usingBlock:^(SKNode *node, BOOL *stop) {
@@ -469,6 +477,23 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
             // TODO: Even though we're removing bricks, the memory usage is still going up. Maybe we need to actually destroy them?
         }
     }];
+    
+    // increase the speed!
+    // if the elapsed time is more than 1 second and the level interval has arrived
+    if ( (int)elapsedTime > 1 && (int)elapsedTime % levelUpdateInterval == 0) {
+        
+        // the last level update stores the game time when the level was last updated.
+        // this if block prevents the level from updating more than once within a second
+        // since elapsedTime as an int will evaluate the same for ~60 frames in a row!
+        if (elapsedTime - lastLevelUpdate > 1.0 ) {
+            NSLog(@"** LEVEL INCREASED! ***");
+            
+            // we just updated the level, so set the lastLevelUpdate to the current elapsed time
+            lastLevelUpdate = elapsedTime;
+        }
+        
+        
+    }
     
 
 }

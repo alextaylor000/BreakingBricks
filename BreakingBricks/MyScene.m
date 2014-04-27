@@ -225,44 +225,19 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
 }
 
-- (CGPoint) addBrickContainer:(CGSize)size startingAt:(CGPoint)brickContainerPos {
-    // this function creates a brickContainer the first time bricks are made,
-    // and then re-uses it for future brick additions
-    
-    // returns point of first brick insertion
-
-    if (!brickContainer ) {
-        // create a container node to hold all the bricks so we can control the group's speed
-        brickContainer = [SKSpriteNode spriteNodeWithColor:[SKColor darkGrayColor] size:CGSizeMake(1, 1)]; // this doesn't need to be a size, the children can exceed its bounds
-        
-        brickContainer.position = brickContainerPos;
-        
-        // add the brickContainer to the scene
-        [self addChild:brickContainer];
-        
-        return CGPointMake(0, 0); // insert first brick at 0,0 if we're initializing the container for the first time
-    } else {
-        return CGPointMake(brickContainerPos.x, brickContainerPos.y); // return the user's intention if the container already exists
-    }
-    
-}
 
 - (void) addBricks:(CGSize)size numberOfBricks:(NSInteger)numBricks startingAt:(CGPoint)brickPos {
     // adds x number of bricks starting at anchor point x
     
-//    // create a container node to hold all the bricks so we can control the group's speed
-//    brickContainer = [SKSpriteNode spriteNodeWithColor:[SKColor darkGrayColor] size:CGSizeMake(1, 1)]; // this doesn't need to be a size, the children can exceed its bounds
-//    
-//    
-//    brickContainer.position = brickPos;
-//    
-//    [self addChild:brickContainer];
+    // create a container node to hold all the bricks so we can control the group's speed
+    brickContainer = [SKSpriteNode spriteNodeWithColor:[SKColor darkGrayColor] size:CGSizeMake(1, 1)]; // this doesn't need to be a size, the children can exceed its bounds
     
-    // cause the brickContainer to be created. this will only run once on init
-    CGPoint brickPosFromContainer = [self addBrickContainer:size startingAt:brickPos];
     
-    // TODO: fix this, this is causing new bricks to be created overtop of existing bricks!
-    brickPos = brickPosFromContainer; // reset the brickPos to be relative to the container
+    brickContainer.position = brickPos;
+    
+    [self addChild:brickContainer];
+    
+    brickPos = CGPointMake(0, 0); // reset the brickPos to be relative to the container
     
     
     for (int i = 0; i < numBricks; i++) {
@@ -393,7 +368,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
-
+        
 
         /* Setup your scene here */
         
@@ -454,7 +429,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 -(void)moveBricksInScene {
     // moves the brick container
-    moveBricks = [SKAction moveByX:-35 y:0 duration:1.0];
+    moveBricks = [SKAction moveByX:-15 y:0 duration:1.0];
     moveBricksForever = [SKAction repeatActionForever:moveBricks];
     
     [brickContainer runAction:moveBricksForever];
@@ -463,16 +438,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
-    // remove old bricks
-    [brickContainer enumerateChildNodesWithName:@"brick" usingBlock:^(SKNode *node, BOOL *stop) {
-        CGPoint nodePositionInScene = [node.scene convertPoint:node.position fromNode:node.parent];
-        if (nodePositionInScene.x < (0 - (node.frame.size.width/2) )   ) {
-            NSLog(@"Removing brick");
-            [node removeFromParent];
-        }
-    }];
-    
-    
 }
 
 
@@ -487,17 +452,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
     if (lastBrickPositionInScene.x < self.frame.size.width) {
         NSLog(@"lastBrick is entering the scene space. Time to add more bricks!");
+        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake((lastBrickPositionInScene.x + lastBrick.size.width + 5), (self.size.height - 25))];
 
-        // adding brick at position relative to brickContainer coords; now that we're appending to brickContainer instead of making a new one
-        // every time, this is necessary
-//        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake((lastBrickPositionInScene.x + lastBrick.size.width + 5), (self.size.height - 25))];
-        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake((lastBrick.position.x + lastBrick.size.width + 5), (self.size.height - 25))];
 
         // move the bricks
-        //[self moveBricksInScene];
+        [self moveBricksInScene];
 
     }
-    
     
 }
 

@@ -474,7 +474,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     // get elapsed time
     NSTimeInterval currentGameTime = [NSDate timeIntervalSinceReferenceDate];
     elapsedTime = currentGameTime - startTime;
-    NSLog(@"elapsed time: %i", (int)elapsedTime);
+//    NSLog(@"elapsed time: %i", (int)elapsedTime);
     
     // remove old bricks
     [self enumerateChildNodesWithName:@"//brick" usingBlock:^(SKNode *node, BOOL *stop) {
@@ -496,7 +496,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         if (elapsedTime - lastLevelUpdate > 1.0 ) {
             NSLog(@"** LEVEL INCREASED! ***");
             
+            ballSpeed *= (1 + levelDifficultyInterval);
+            bricksSpeed *= (1 + levelDifficultyInterval);
             
+            // cancel brick actions and update the speed
+            [brickContainer removeAllActions];
+            [self moveBricksInSceneBySpeed:bricksSpeed];
+            NSLog(@"Moving bricks @ %01.f", bricksSpeed);
             
             // we just updated the level, so set the lastLevelUpdate to the current elapsed time
             lastLevelUpdate = elapsedTime;

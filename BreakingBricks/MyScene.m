@@ -242,7 +242,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     // adds x number of bricks starting at anchor point x
     
     // create a container node to hold all the bricks so we can control the group's speed
+
     brickContainer = [SKSpriteNode spriteNodeWithColor:[SKColor darkGrayColor] size:CGSizeMake(1, 1)]; // this doesn't need to be a size, the children can exceed its bounds
+
+
     
     
     brickContainer.position = brickPos;
@@ -295,7 +298,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         NSLog(@"Brick container size is %0fx%0f", brickContainer.frame.size.width, brickContainer.frame.size.height);
         NSLog(@"(%i) Adding brick '%@' at %0f, %0f with category %u", i, brick.name, brick.position.x, brick.position.y, brick.physicsBody.categoryBitMask);
         SKLabelNode *label = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
-        label.text = [NSString stringWithFormat:@"%@", brick.name] ;
+        label.text = [NSString stringWithFormat:@"%@%i", brick.name, i] ;
 
         if (brick.physicsBody.categoryBitMask == brickBadCategory) {
             label.fontColor = [SKColor redColor];
@@ -434,7 +437,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         self.physicsBody.categoryBitMask = edgeCategory;
         
         
-        [self addBall:size]; // size of scene
+        //[self addBall:size]; // size of scene
         [self addPlayer:size];
         [self addBricks:size numberOfBricks:10 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
         [self addBottomEdge:size];
@@ -444,17 +447,17 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
         
         // move the bricks
-        [self moveBricksInScene];
+        [self moveBricksInSceneBySpeed:bricksSpeed];
         
         
     }
     return self;
 }
 
--(void)moveBricksInScene {
+-(void)moveBricksInSceneBySpeed:(CGFloat)speed {
     // moves the brick container
 
-    moveBricks = [SKAction moveByX:bricksSpeed y:0 duration:1.0];
+    moveBricks = [SKAction moveByX:speed y:0 duration:1.0];
     moveBricksForever = [SKAction repeatActionForever:moveBricks];
     
     [brickContainer runAction:moveBricksForever];
@@ -488,6 +491,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         if (elapsedTime - lastLevelUpdate > 1.0 ) {
             NSLog(@"** LEVEL INCREASED! ***");
             
+            // increase the speed of ball and bricks by the percentage defined in levelDifficultyInterval
+            //ballSpeed += 0.1;
+            //bricksSpeed += 0.1;
+            
+            
+            NSLog(@"Ballspeed is now %0.1f, brickspeed is %0.1f", ballSpeed, bricksSpeed);
+            
             // we just updated the level, so set the lastLevelUpdate to the current elapsed time
             lastLevelUpdate = elapsedTime;
         }
@@ -514,7 +524,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 
         // move the bricks
-        [self moveBricksInScene];
+        [self moveBricksInSceneBySpeed:bricksSpeed];
 
     }
     

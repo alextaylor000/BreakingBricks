@@ -69,9 +69,10 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
     NSTimeInterval lastLevelUpdate; // the time of the last level update, to make sure it only updates once per interval
     
     // speed properties
+    // beginning velocities of objects
     CGFloat ballSpeed;
     CGFloat bricksSpeed;
-    
+
     // difficulty properties
     NSInteger levelUpdateInterval; // how many seconds to update the level
     CGFloat levelDifficultyInterval; // percentage to increase speed by
@@ -238,21 +239,22 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 }
 
 
-- (void) addBricks:(CGSize)size numberOfBricks:(NSInteger)numBricks startingAt:(CGPoint)brickPos {
-    // adds x number of bricks starting at anchor point x
-    
+- (void) addBrickContainer:(CGSize)size startingAt:(CGPoint)brickContainerPos {
     // create a container node to hold all the bricks so we can control the group's speed
 
     brickContainer = [SKSpriteNode spriteNodeWithColor:[SKColor darkGrayColor] size:CGSizeMake(1, 1)]; // this doesn't need to be a size, the children can exceed its bounds
-
-
     
-    
-    brickContainer.position = brickPos;
+    brickContainer.position = brickContainerPos;
     
     [self addChild:brickContainer];
     
-    brickPos = CGPointMake(0, 0); // reset the brickPos to be relative to the container
+}
+
+- (void) addBricks:(CGSize)size numberOfBricks:(NSInteger)numBricks startingAt:(CGPoint)brickPos {
+    // adds x number of bricks starting at anchor point x
+    
+    
+    //brickPos = CGPointMake(0, 0); // reset the brickPos to be relative to the container
     
     
     for (int i = 0; i < numBricks; i++) {
@@ -439,7 +441,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         //[self addBall:size]; // size of scene
         [self addPlayer:size];
-        [self addBricks:size numberOfBricks:10 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
+        [self addBrickContainer:size startingAt:CGPointMake(40, size.height - 25)];
+//        [self addBricks:size numberOfBricks:10 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
+        [self addBricks:size numberOfBricks:10 startingAt:CGPointMake(0, 0)]; // just test coords for now
+
         [self addBottomEdge:size];
         
         // add score
@@ -491,12 +496,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         if (elapsedTime - lastLevelUpdate > 1.0 ) {
             NSLog(@"** LEVEL INCREASED! ***");
             
-            // increase the speed of ball and bricks by the percentage defined in levelDifficultyInterval
-            //ballSpeed += 0.1;
-            //bricksSpeed += 0.1;
             
-            
-            NSLog(@"Ballspeed is now %0.1f, brickspeed is %0.1f", ballSpeed, bricksSpeed);
             
             // we just updated the level, so set the lastLevelUpdate to the current elapsed time
             lastLevelUpdate = elapsedTime;
@@ -520,28 +520,12 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
     if (lastBrickPositionInScene.x < self.frame.size.width) {
         NSLog(@"lastBrick is entering the scene space. Time to add more bricks!");
-        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake((lastBrickPositionInScene.x + lastBrick.size.width + 5), (self.size.height - 25))];
-
-
-        // move the bricks
-        [self moveBricksInSceneBySpeed:bricksSpeed];
+        //[self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake((lastBrickPositionInScene.x + lastBrick.size.width + 5), (self.size.height - 25))];
+        [self addBricks:self.size numberOfBricks:10 startingAt:CGPointMake(lastBrick.position.x + lastBrick.size.width + 5, 0)];
 
     }
     
 }
-
-- (void)didSimulatePhysics
-{
-    // remove bricks if they pass the left edge
-//    [self enumerateChildNodesWithName:@"brick" usingBlock:
-//     ^(SKNode *node, BOOL *stop) {
-//         if (node.position.x < (0 - (node.frame.size.width/2)))
-//
-//             [node removeFromParent];
-//     }];
-}
-
-
 
 
 @end

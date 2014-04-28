@@ -137,8 +137,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     }
     
     if (notTheBall.categoryBitMask == bottomEdgeCategory) {
-//        EndScene *end = [EndScene sceneWithSize:self.size];
-//        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
+        EndScene *end = [EndScene sceneWithSize:self.size];
+        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
         
     }
     

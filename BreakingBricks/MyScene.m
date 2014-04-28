@@ -53,6 +53,9 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
     SKAction *moveBricks;
     SKAction *moveBricksForever;
     
+    // ball should be accessible for changing its speed
+    SKSpriteNode *ball;
+    
     // make the brickContainer accessible so we can move it in the game loop
     SKSpriteNode *brickContainer;
 
@@ -138,8 +141,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     }
     
     if (notTheBall.categoryBitMask == bottomEdgeCategory) {
-        EndScene *end = [EndScene sceneWithSize:self.size];
-        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
+//        EndScene *end = [EndScene sceneWithSize:self.size];
+//        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
         
     }
     
@@ -164,7 +167,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 - (void)addBall:(CGSize)size
 {
     // create sprite
-    SKSpriteNode *ball = [SKSpriteNode spriteNodeWithImageNamed:@"ball"];
+    ball = [SKSpriteNode spriteNodeWithImageNamed:@"ball"];
     
     CGPoint myPoint = CGPointMake(size.width/2, size.height - 75);
     //ball.size = CGSizeMake(27, 27);
@@ -439,10 +442,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         self.physicsBody.categoryBitMask = edgeCategory;
         
         
-        //[self addBall:size]; // size of scene
+        [self addBall:size]; // size of scene
         [self addPlayer:size];
         [self addBrickContainer:size startingAt:CGPointMake(40, size.height - 25)];
-//        [self addBricks:size numberOfBricks:10 startingAt:CGPointMake(40, (size.height - 25))]; // just test coords for now
         [self addBricks:size numberOfBricks:10 startingAt:CGPointMake(0, 0)]; // just test coords for now
 
         [self addBottomEdge:size];
@@ -496,13 +498,36 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         if (elapsedTime - lastLevelUpdate > 1.0 ) {
             NSLog(@"** LEVEL INCREASED! ***");
             
-            ballSpeed *= (1 + levelDifficultyInterval);
+            ballSpeed = (1 + levelDifficultyInterval);
             bricksSpeed *= (1 + levelDifficultyInterval);
             
             // cancel brick actions and update the speed
             [brickContainer removeAllActions];
             [self moveBricksInSceneBySpeed:bricksSpeed];
             NSLog(@"Moving bricks @ %01.f", bricksSpeed);
+            
+
+            
+            // add a vector to the ball
+            SKAction *ballFadeToOrange = [SKAction colorizeWithColor:[SKColor orangeColor] colorBlendFactor:0.75 duration:0.25];
+            SKAction *ballFadeFromOrange = [SKAction colorizeWithColor:[SKColor whiteColor] colorBlendFactor:0 duration:0.25];
+            SKAction *ballLevelsUp = [SKAction sequence:@[ballFadeToOrange, ballFadeFromOrange]];
+            [ball runAction:ballLevelsUp];
+            
+            NSLog(@": Ball is travelling at vector %0.1f, %01.f", ball.physicsBody.velocity.dx, ball.physicsBody.velocity.dy);
+            
+            // we need to apply an impulse to the ball to give it another push
+            // so we need to get a ratio of how fast the ball is travelling in both directions
+            // to do this, we'll take the ball's current velocity and express it as a percentage
+            // then, to speed the ball up, we can multiply that by the ball speed
+            
+            // I've set the ball speed to just be the levelDifficultyInterval, this may need
+            // to be tweaked to get a good feeling of speed
+            CGVector myVector = CGVectorMake((100/ball.physicsBody.velocity.dx)*ballSpeed, (100/ball.physicsBody.velocity.dy)*ballSpeed);
+            [ball.physicsBody applyImpulse: myVector];
+            NSLog(@"+ Ball is travelling at vector %0.1f, %01.f", ball.physicsBody.velocity.dx, ball.physicsBody.velocity.dy);
+            
+            
             
             // we just updated the level, so set the lastLevelUpdate to the current elapsed time
             lastLevelUpdate = elapsedTime;

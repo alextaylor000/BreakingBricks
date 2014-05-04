@@ -10,5 +10,12 @@
 
 @interface PlayerScore : SKLabelNode
 
+@property NSInteger currentScore;
+
+/** 
+ test documentation
+ */
+- (SKLabelNode *) newLabelNode;
+
 
 @end

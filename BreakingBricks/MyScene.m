@@ -450,8 +450,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         [self addBottomEdge:size];
         
         // add score
-        [self addScore:size withScore:currentScore];
+        //[self addScore:size withScore:currentScore];
+        PlayerScore *myScore = [[PlayerScore alloc]init];
+        myScore.position = CGPointMake(self.frame.size.width - 10, 10);
+        [self addChild:myScore];
 
+
+        
         
         // move the bricks
         [self moveBricksInSceneBySpeed:bricksSpeed];

@@ -64,8 +64,6 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
     
     // score properties
     PlayerScore *myScore;
-//    SKLabelNode *scoreLabel;
-//    NSInteger currentScore;
     
     // timer properties
     NSTimeInterval startTime;
@@ -93,8 +91,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 {
     return skRandf() * (high - low) + low;
 }
-
-
 
 
 // the contact methods are being provided by the delegate
@@ -142,17 +138,14 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     }
     
     if (notTheBall.categoryBitMask == bottomEdgeCategory) {
-//        EndScene *end = [EndScene sceneWithSize:self.size];
-//        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
+        EndScene *end = [EndScene sceneWithSize:self.size];
+        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
         
     }
     
     
 }
 
-- (void)didEndContact:(SKPhysicsContact *)contact {
-    
-}
 
 - (void)addBottomEdge:(CGSize) size {
     // the "game over" edge at the bottom
@@ -207,28 +200,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     // e.g. this line would disable collision for the paddle
     // ball.physicsBody.collisionBitMask = edgeCategory | brickCategory;
     
-//    // create orb animation
-//    SKTextureAtlas *orbAtlas = [SKTextureAtlas atlasNamed:@"orb"];
-//    
-//    // get image names and sort them
-//    NSArray *orbImages = [orbAtlas textureNames];
-//    NSArray *orbImagesSorted = [orbImages sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-//    
-//    // create an actual texture array
-//    NSMutableArray *orbTextures = [NSMutableArray array];
-//
-//    for (NSString *filename in orbImagesSorted) {
-//        SKTexture *texture = [orbAtlas textureNamed:filename];
-//        [orbTextures addObject:texture];
-//    }
-//    
-//    // create animation
-//    SKAction *glow = [SKAction animateWithTextures:orbTextures timePerFrame:0.1];
-//    
-//    SKAction *keepGlowing = [SKAction repeatActionForever:glow];
-//
-//    [ball runAction:keepGlowing];
-    
     // add to scene
     [self addChild:ball];
     
@@ -254,11 +225,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
 }
 
+
 - (void) addBricks:(CGSize)size numberOfBricks:(NSInteger)numBricks startingAt:(CGPoint)brickPos {
     // adds x number of bricks starting at anchor point x
-    
-    
-    //brickPos = CGPointMake(0, 0); // reset the brickPos to be relative to the container
     
     
     for (int i = 0; i < numBricks; i++) {
@@ -371,21 +340,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
 }
 
-//- (void)addScore:(CGSize)size withScore:(NSInteger)score {
-//    scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
-//    scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeRight;
-//    scoreLabel.text = [NSString stringWithFormat:@"Score: %i", score];
-//    scoreLabel.fontColor = [SKColor yellowColor];
-//    scoreLabel.fontSize = 25;
-//    scoreLabel.position = CGPointMake(self.frame.size.width - 10, 10);
-//    [self addChild: scoreLabel];
-//
-//}
-//
-//- (void)updateScoreWithIncrement:(NSInteger)score {
-//    currentScore = currentScore + score;
-//    scoreLabel.text = [NSString stringWithFormat:@"Score: %i" , currentScore];
-//}
 
 
 -(id)initWithSize:(CGSize)size {
@@ -402,11 +356,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         // set the difficulty
         levelUpdateInterval = 10;
         levelDifficultyInterval = 0.1;
-        
-        /* Setup your scene here */
-        
 
-
+        
         /* Init sounds */
         soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
         soundBrickHit = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
@@ -445,9 +396,14 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         [self addBall:size]; // size of scene
         [self addPlayer:size];
-        [self addBrickContainer:size startingAt:CGPointMake(40, size.height - 25)];
+        [self addBrickContainer:size startingAt:CGPointMake(self.frame.size.width/2 + 25, size.height - 25)];
         [self addBricks:size numberOfBricks:10 startingAt:CGPointMake(0, 0)]; // just test coords for now
 
+        // fade in the bricks
+        brickContainer.alpha = 0.0;
+        SKAction *fadeIn = [SKAction fadeInWithDuration:1.0];
+        [brickContainer runAction:fadeIn];
+        
         [self addBottomEdge:size];
         
         // add score
@@ -455,9 +411,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         myScore = [[PlayerScore alloc]init];
         myScore.position = CGPointMake(self.frame.size.width - 10, 10);
         [self addChild:myScore];
-
-
-
         
         
         // move the bricks
@@ -483,7 +436,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     // get elapsed time
     NSTimeInterval currentGameTime = [NSDate timeIntervalSinceReferenceDate];
     elapsedTime = currentGameTime - startTime;
-//    NSLog(@"elapsed time: %i", (int)elapsedTime);
     
     // remove old bricks
     [self enumerateChildNodesWithName:@"//brick" usingBlock:^(SKNode *node, BOOL *stop) {

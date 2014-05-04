@@ -63,15 +63,15 @@ static CGFloat const    playerScoreFontColorAlpha   = 1.0; // A
 - (void)incrementCurrentScoreBy: (NSInteger)points {
     // TODO: Verify that the userData dict is storing this value correctly
     NSNumber *currentScore = self.userData[@"score"];
-    currentScore = [NSNumber numberWithInt:(currentScore.intValue + points)];
+    currentScore = [NSNumber numberWithInteger:(currentScore.integerValue + points)];
     [self.userData setObject:currentScore forKey:@"score"];
-    
+
     self.text = [self synthesizeTextLabel];
 }
 
 - (void)resetScoreTo: (NSInteger)points {
     NSNumber *currentScore = self.userData[@"score"];
-    currentScore = [NSNumber numberWithInt:(points)];
+    currentScore = [NSNumber numberWithInteger:(points)];
     [self.userData setObject:currentScore forKey:@"score"];
     
     self.text = [self synthesizeTextLabel];

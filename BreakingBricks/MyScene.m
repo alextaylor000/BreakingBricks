@@ -63,8 +63,9 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
     SKSpriteNode *lastBrick ;
     
     // score properties
-    SKLabelNode *scoreLabel;
-    NSInteger currentScore;
+    PlayerScore *myScore;
+//    SKLabelNode *scoreLabel;
+//    NSInteger currentScore;
     
     // timer properties
     NSTimeInterval startTime;
@@ -119,7 +120,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         [notTheBall.node removeFromParent];
 
         // update score
-        [self updateScoreWithIncrement:1];
+        [myScore incrementCurrentScoreBy:10];
         
     }
 
@@ -129,7 +130,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         [notTheBall.node removeFromParent];
         
         // update score
-        [self updateScoreWithIncrement:-1];
+        [myScore incrementCurrentScoreBy:-5];
         
     }
 
@@ -370,21 +371,21 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
 }
 
-- (void)addScore:(CGSize)size withScore:(NSInteger)score {
-    scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
-    scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeRight;
-    scoreLabel.text = [NSString stringWithFormat:@"Score: %i", score];
-    scoreLabel.fontColor = [SKColor yellowColor];
-    scoreLabel.fontSize = 25;
-    scoreLabel.position = CGPointMake(self.frame.size.width - 10, 10);
-    [self addChild: scoreLabel];
-
-}
-
-- (void)updateScoreWithIncrement:(NSInteger)score {
-    currentScore = currentScore + score;
-    scoreLabel.text = [NSString stringWithFormat:@"Score: %i" , currentScore];
-}
+//- (void)addScore:(CGSize)size withScore:(NSInteger)score {
+//    scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
+//    scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeRight;
+//    scoreLabel.text = [NSString stringWithFormat:@"Score: %i", score];
+//    scoreLabel.fontColor = [SKColor yellowColor];
+//    scoreLabel.fontSize = 25;
+//    scoreLabel.position = CGPointMake(self.frame.size.width - 10, 10);
+//    [self addChild: scoreLabel];
+//
+//}
+//
+//- (void)updateScoreWithIncrement:(NSInteger)score {
+//    currentScore = currentScore + score;
+//    scoreLabel.text = [NSString stringWithFormat:@"Score: %i" , currentScore];
+//}
 
 
 -(id)initWithSize:(CGSize)size {
@@ -404,7 +405,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         /* Setup your scene here */
         
-        currentScore = 0;
+
 
         /* Init sounds */
         soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
@@ -451,9 +452,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         // add score
         //[self addScore:size withScore:currentScore];
-        PlayerScore *myScore = [[PlayerScore alloc]init];
+        myScore = [[PlayerScore alloc]init];
         myScore.position = CGPointMake(self.frame.size.width - 10, 10);
         [self addChild:myScore];
+
 
 
         

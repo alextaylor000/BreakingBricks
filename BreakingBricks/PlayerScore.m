@@ -13,6 +13,7 @@ static NSString * const playerScoreFontName = @"Futura Medium";
 static NSInteger const  playerScoreFontSize = 25;
 static NSString * const playerScoreLabel = @"Score: %i";
 static NSInteger const  playerScoreAlignment = SKLabelHorizontalAlignmentModeRight;
+static NSInteger const  playerScoreInitial = 0;
 
 // score color
 static CGFloat const    playerScoreFontColorRed     = 1.0; // R
@@ -37,11 +38,15 @@ static CGFloat const    playerScoreFontColorAlpha   = 1.0; // A
     self = [super init];
     if (self) {
         // initialize with a score of zero
-        self.currentScore = 0;
+        // store this in userdata so that it will be archived automagically
+        NSNumber *initialScore = [NSNumber numberWithInt:playerScoreInitial];
+        self.userData = [NSMutableDictionary dictionaryWithDictionary:@{@"score": initialScore}];
+        
         self.text = [self synthesizeTextLabel];
         self.horizontalAlignmentMode = playerScoreAlignment;
         self.fontName = playerScoreFontName;
         self.fontColor = [SKColor colorWithRed:playerScoreFontColorRed green:playerScoreFontColorGreen blue:playerScoreFontColorBlue alpha:playerScoreFontColorAlpha];
+        self.fontSize = playerScoreFontSize;
         
         return self;
     }
@@ -51,32 +56,24 @@ static CGFloat const    playerScoreFontColorAlpha   = 1.0; // A
 }
 
 - (NSString *) synthesizeTextLabel {
-
-    return [NSString stringWithFormat:playerScoreLabel, self.currentScore];
+    return [NSString stringWithFormat:playerScoreLabel, [self.userData[@"score"] intValue] ];
 }
-
-//- (SKLabelNode *) newLabelNode {
-//    
-//    // create a label node with the attribs above and return it
-//    scoreLabel = [SKLabelNode labelNodeWithFontNamed:fontName];
-//    scoreLabel.text = [self synthesizeTextLabel];
-//    
-//    scoreLabel.horizontalAlignmentMode = playerScoreAlignment;
-//    scoreLabel.fontColor = [SKColor colorWithRed:playerScoreFontColorRed green:playerScoreFontColorGreen blue:playerScoreFontColorBlue alpha:playerScoreFontColorAlpha];
-//    
-//    // return the label for placement in scene
-//    return scoreLabel;
-//}
 
 
 - (void)incrementCurrentScoreBy: (NSInteger)points {
-
-    self.currentScore += points;
+    // TODO: Verify that the userData dict is storing this value correctly
+    NSNumber *currentScore = self.userData[@"score"];
+    currentScore = [NSNumber numberWithInt:(currentScore.intValue + points)];
+    [self.userData setObject:currentScore forKey:@"score"];
+    
     self.text = [self synthesizeTextLabel];
 }
 
 - (void)resetScoreTo: (NSInteger)points {
-    self.currentScore = points;
+    NSNumber *currentScore = self.userData[@"score"];
+    currentScore = [NSNumber numberWithInt:(points)];
+    [self.userData setObject:currentScore forKey:@"score"];
+    
     self.text = [self synthesizeTextLabel];
     
 }

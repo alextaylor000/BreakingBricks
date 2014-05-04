@@ -10,12 +10,11 @@
 
 @interface PlayerScore : SKLabelNode
 
-@property NSInteger currentScore;
+/** Adds a number of points to the player's current score. */
+- (void)incrementCurrentScoreBy: (NSInteger)points;
 
-/** 
- test documentation
- */
-- (SKLabelNode *) newLabelNode;
+/** Resets the player's current score to the value specified. */
+- (void)resetScoreTo: (NSInteger)points;
 
 
 @end

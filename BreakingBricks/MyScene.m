@@ -43,6 +43,19 @@ static const uint32_t bottomEdgeCategory = 0x1 << 4;
 static const uint32_t brickBadCategory  = 0x1 << 5;
 
 
+// sizes for graphics
+// these are different than the actual image sizes because of the glows and shadows
+static const CGFloat    graphicsPaddleWidth     =   101;
+static const CGFloat    graphicsPaddleHeight    =   16;
+
+static const CGFloat    graphicsBrickWidth      =   60;
+static const CGFloat    graphicsBrickHeight     =   30;
+
+static const CGFloat    graphicsBallDiameter    =   27;
+
+
+
+
 @implementation MyScene {
     // in-game sounds; alloc'd here so there's no pause when the sounds are loaded
     SKAction *soundPaddleHit;
@@ -78,7 +91,9 @@ static const uint32_t brickBadCategory  = 0x1 << 5;
     // difficulty properties
     NSInteger levelUpdateInterval; // how many seconds to update the level
     CGFloat levelDifficultyInterval; // percentage to increase speed by
-
+    
+    SKTexture *brickGood;
+    SKTexture *brickBad;
 }
 
 
@@ -161,14 +176,16 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 - (void)addBall:(CGSize)size
 {
     // create sprite
-    ball = [SKSpriteNode spriteNodeWithImageNamed:@"ball"];
+    ball = [SKSpriteNode spriteNodeWithImageNamed:@"ball_yellow"];
     
     CGPoint myPoint = CGPointMake(size.width/2, size.height - 75);
     //ball.size = CGSizeMake(27, 27);
     ball.position = myPoint;
     
     // add physics body to ball
-    ball.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:ball.frame.size.width/2];
+    ball.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:graphicsBallDiameter/2];
+    
+    
     // reduce friction
     // describes the energy lost when objects slide against each other
     ball.physicsBody.friction = 0;
@@ -232,17 +249,17 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
     for (int i = 0; i < numBricks; i++) {
         
-        SKSpriteNode *brick = [SKSpriteNode spriteNodeWithImageNamed:@"brick"];
+
+        
+        SKSpriteNode *brick = [SKSpriteNode spriteNodeWithTexture:brickGood];
         
         
         brick.name = @"brick";
-        
-        
 
         
         // commented this out because I think it was interfering with the physics body
         //brick.anchorPoint = CGPointMake(0, 0); // make the anchor point bottom-left instead of center
-        brick.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:brick.frame.size];
+        brick.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(graphicsBrickWidth, graphicsBrickHeight)];
         brick.physicsBody.dynamic = NO;
 
         brick.physicsBody.friction = 0;
@@ -260,8 +277,6 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
         // place the brick
         
-        
-        //brick.position = CGPointMake(brickPos.x + (brick.size.width/2), brickPos.y);
         brick.position = CGPointMake(brickPos.x, brickPos.y);
         
         CGFloat brickWidth = brick.size.width;
@@ -272,23 +287,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         // debug
         NSLog(@"Brick container size is %0fx%0f", brickContainer.frame.size.width, brickContainer.frame.size.height);
         NSLog(@"(%i) Adding brick '%@' at %0f, %0f with category %u", i, brick.name, brick.position.x, brick.position.y, brick.physicsBody.categoryBitMask);
-        SKLabelNode *label = [SKLabelNode labelNodeWithFontNamed:@"Futura Medium"];
-        label.text = [NSString stringWithFormat:@"%@%i", brick.name, i] ;
 
         if (brick.physicsBody.categoryBitMask == brickBadCategory) {
-            label.fontColor = [SKColor redColor];
-            
-        } else if (brick.physicsBody.categoryBitMask == brickCategory)  {
-            label.fontColor = [SKColor blueColor];
-        } else {
-            label.fontColor = [SKColor greenColor];
+            brick.texture = brickBad;
         }
-        
-        
-        label.fontSize = 10;
-        label.position = CGPointMake(0, 0);
-        [brick addChild:label];
-
         
         
         [brickContainer addChild:brick];
@@ -304,11 +306,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
     // create paddle
     // self.paddle ensures that the object will be assigned to the public property "paddle"
-    self.paddle = [SKSpriteNode spriteNodeWithImageNamed:@"paddle"];
-
+    self.paddle = [SKSpriteNode spriteNodeWithImageNamed:@"paddle_teal"];
     
     self.paddle.position = CGPointMake(size.width/2, 50.0);
-    self.paddle.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:self.paddle.frame.size];
+    self.paddle.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize: CGSizeMake(graphicsPaddleWidth, graphicsPaddleHeight)];
     self.paddle.physicsBody.dynamic = NO;
     self.paddle.physicsBody.categoryBitMask = paddleCategory;
     
@@ -363,7 +364,14 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         soundBrickHit = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
         soundBrickHitBad = [SKAction playSoundFileNamed:@"brickhit.caf" waitForCompletion:NO];
         
-        self.backgroundColor = [SKColor blackColor];
+        /* Init textures */
+        brickGood = [SKTexture textureWithImageNamed:@"brick_good"];
+        brickBad = [SKTexture textureWithImageNamed:@"brick_bad"];
+        
+        // background image
+        SKSpriteNode *backgroundImage = [SKSpriteNode spriteNodeWithImageNamed:@"background"];
+        backgroundImage.position = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
+        [self addChild:backgroundImage];
         
         // scene's physics body
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];

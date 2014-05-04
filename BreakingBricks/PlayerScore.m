@@ -9,16 +9,16 @@
 #import "PlayerScore.h"
 
 // constants
-static NSString * const playerScoreFontName = @"Futura Medium";
+static NSString * const playerScoreFontName = @"Helvetica-Bold";
 static NSInteger const  playerScoreFontSize = 25;
-static NSString * const playerScoreLabel = @"Score: %i";
+static NSString * const playerScoreLabel = @"%i";
 static NSInteger const  playerScoreAlignment = SKLabelHorizontalAlignmentModeRight;
 static NSInteger const  playerScoreInitial = 0;
 
 // score color
-static CGFloat const    playerScoreFontColorRed     = 1.0; // R
-static CGFloat const    playerScoreFontColorGreen   = 1.0; // G
-static CGFloat const    playerScoreFontColorBlue    = 0.0; // B
+static CGFloat const    playerScoreFontColorRed     = 0.29; // R
+static CGFloat const    playerScoreFontColorGreen   = 0.29; // G
+static CGFloat const    playerScoreFontColorBlue    = 0.29; // B
 static CGFloat const    playerScoreFontColorAlpha   = 1.0; // A
 
 
@@ -52,7 +52,6 @@ static CGFloat const    playerScoreFontColorAlpha   = 1.0; // A
     }
     
     return self;
-
 }
 
 - (NSString *) synthesizeTextLabel {

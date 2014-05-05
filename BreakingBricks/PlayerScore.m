@@ -11,6 +11,10 @@
 // constants
 static NSString * const playerScoreFontName = @"Helvetica-Bold";
 static NSInteger const  playerScoreFontSize = 25;
+
+static NSString * const playerEventFontName = @"Helvetica-Light";
+static NSInteger const  playerEventFontSize = 35;
+
 static NSString * const playerScoreLabel = @"%i";
 static NSInteger const  playerScoreAlignment = SKLabelHorizontalAlignmentModeRight;
 static NSInteger const  playerScoreInitial = 0;
@@ -20,6 +24,13 @@ static CGFloat const    playerScoreFontColorRed     = 0.29; // R
 static CGFloat const    playerScoreFontColorGreen   = 0.29; // G
 static CGFloat const    playerScoreFontColorBlue    = 0.29; // B
 static CGFloat const    playerScoreFontColorAlpha   = 1.0; // A
+
+static CGFloat const    playerEventFontColorRed     = 1; // R
+static CGFloat const    playerEventFontColorGreen   = 0; // G
+static CGFloat const    playerEventFontColorBlue    = 0.706; // B
+static CGFloat const    playerEventFontColorAlpha   = 1.0; // A
+
+
 
 
 @interface PlayerScore ()
@@ -31,6 +42,11 @@ static CGFloat const    playerScoreFontColorAlpha   = 1.0; // A
 @implementation PlayerScore {
     // stores the score label so we can update it in the class
     SKLabelNode *scoreLabel;
+    
+    
+    SKLabelNode *eventLabel;
+    SKAction *eventLabelFadesOut;
+    
 }
 
 - (instancetype)init
@@ -54,6 +70,18 @@ static CGFloat const    playerScoreFontColorAlpha   = 1.0; // A
     return self;
 }
 
+- (SKLabelNode *)addEventLabel {
+    eventLabel = [SKLabelNode labelNodeWithFontNamed:playerEventFontName];
+    eventLabel.horizontalAlignmentMode = playerScoreAlignment;
+    eventLabel.fontSize = playerEventFontSize;
+    eventLabel.fontColor = [SKColor colorWithRed:playerEventFontColorRed green:playerEventFontColorGreen blue:playerEventFontColorBlue alpha:playerEventFontColorAlpha];
+    // init the fade-out action
+    eventLabelFadesOut = [SKAction fadeOutWithDuration:0.4];
+    
+    return eventLabel;
+
+}
+
 - (NSString *) synthesizeTextLabel {
     return [NSString stringWithFormat:playerScoreLabel, [self.userData[@"score"] intValue] ];
 }
@@ -66,6 +94,17 @@ static CGFloat const    playerScoreFontColorAlpha   = 1.0; // A
     [self.userData setObject:currentScore forKey:@"score"];
 
     self.text = [self synthesizeTextLabel];
+    
+    if (eventLabel) {
+        // end any existing actions
+        [eventLabel removeAllActions];
+        
+        // reset the transparency
+        eventLabel.alpha = 1.0;
+        eventLabel.text = [NSString stringWithFormat:@"%+d", points];
+        [eventLabel runAction:eventLabelFadesOut];
+    }
+    
 }
 
 - (void)resetScoreTo: (NSInteger)points {

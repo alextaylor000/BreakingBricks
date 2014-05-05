@@ -77,6 +77,7 @@ static const CGFloat    graphicsBallDiameter    =   27;
     
     // score properties
     PlayerScore *myScore;
+    SKLabelNode *myScoreEvent;
     
     // timer properties
     NSTimeInterval startTime;
@@ -91,9 +92,14 @@ static const CGFloat    graphicsBallDiameter    =   27;
     // difficulty properties
     NSInteger levelUpdateInterval; // how many seconds to update the level
     CGFloat levelDifficultyInterval; // percentage to increase speed by
+    NSInteger currentLevel;
     
     SKTexture *brickGood;
     SKTexture *brickBad;
+    
+    SKTexture *levelOn;
+    SKTexture *levelOff;
+    
 }
 
 
@@ -153,14 +159,22 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     }
     
     if (notTheBall.categoryBitMask == bottomEdgeCategory) {
-        EndScene *end = [EndScene sceneWithSize:self.size];
-        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
+//        EndScene *end = [EndScene sceneWithSize:self.size];
+//        [self.view presentScene:end transition:[SKTransition doorsCloseHorizontalWithDuration:0.5]];
         
     }
     
     
 }
 
+
+- (void)addScoreEvent:(CGSize) size {
+    // TODO: refactor this into PlayerScore
+    myScoreEvent = [myScore addEventLabel];
+    
+    myScoreEvent.position = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
+    [self addChild:myScoreEvent];
+}
 
 - (void)addBottomEdge:(CGSize) size {
     // the "game over" edge at the bottom
@@ -172,6 +186,19 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
 }
 
+- (void)addLevelIndicator:(CGSize)size forLevel: (NSInteger)level {
+
+    
+    SKLabelNode *levelIndicator = [SKLabelNode labelNodeWithFontNamed:@"AmericanTypewriter-Bold"];
+    levelIndicator.position = CGPointMake((level * 15), 10);
+    levelIndicator.fontSize = 50;
+    levelIndicator.text = @".";
+    levelIndicator.fontColor = [SKColor colorWithRed:0.29 green:0.29 blue:0.29 alpha:1.0];
+    [self addChild:levelIndicator];
+    
+    
+    
+}
 
 - (void)addBall:(CGSize)size
 {
@@ -357,7 +384,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         // set the difficulty
         levelUpdateInterval = 10;
         levelDifficultyInterval = 0.1;
-
+        currentLevel = 1;
         
         /* Init sounds */
         soundPaddleHit = [SKAction playSoundFileNamed:@"blip.caf" waitForCompletion:NO];
@@ -367,11 +394,15 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         /* Init textures */
         brickGood = [SKTexture textureWithImageNamed:@"brick_good"];
         brickBad = [SKTexture textureWithImageNamed:@"brick_bad"];
+        levelOn = [SKTexture textureWithImageNamed:@"level_on"];
+        levelOff = [SKTexture textureWithImageNamed:@"level_off"];
         
         // background image
         SKSpriteNode *backgroundImage = [SKSpriteNode spriteNodeWithImageNamed:@"background"];
         backgroundImage.position = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
         [self addChild:backgroundImage];
+        
+        
         
         // scene's physics body
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
@@ -420,6 +451,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         myScore.position = CGPointMake(self.frame.size.width - 10, 10);
         [self addChild:myScore];
         
+        // add event label
+        // TODO: refactor this into the PlayerScore somehow
+        [self addScoreEvent:size];
+        
+        // add difficulty indicator
+        [self addLevelIndicator:size forLevel:1];
+
         
         // move the bricks
         [self moveBricksInSceneBySpeed:bricksSpeed];
@@ -463,6 +501,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         // this if block prevents the level from updating more than once within a second
         // since elapsedTime as an int will evaluate the same for ~60 frames in a row!
         if (elapsedTime - lastLevelUpdate > 1.0 ) {
+            currentLevel += 1;
+            
+            [self addLevelIndicator:self.size forLevel:currentLevel];
+            
             NSLog(@"** LEVEL INCREASED! ***");
             
             ballSpeed = (1 + levelDifficultyInterval);

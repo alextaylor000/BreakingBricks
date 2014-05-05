@@ -16,5 +16,7 @@
 /** Resets the player's current score to the value specified. */
 - (void)resetScoreTo: (NSInteger)points;
 
+/** Adds a label above the score that displays the last score event */
+- (SKLabelNode *)addEventLabel;
 
 @end

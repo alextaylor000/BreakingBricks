@@ -54,6 +54,11 @@ static const CGFloat    graphicsBrickHeight     =   30;
 static const CGFloat    graphicsBallDiameter    =   27;
 
 
+// scores
+static const NSInteger  scoreGoodBrick          =   15;
+static const NSInteger  scoreBadBrick           =   -5;
+static const NSInteger  scoreMissedGoodBrick        =   -10;
+
 
 
 @implementation MyScene {
@@ -159,7 +164,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
 
         // update score
-        [myScore incrementCurrentScoreBy:10];
+        [myScore incrementCurrentScoreBy:scoreGoodBrick];
         
     }
 
@@ -172,7 +177,7 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         
         
         // update score
-        [myScore incrementCurrentScoreBy:-5];
+        [myScore incrementCurrentScoreBy:scoreBadBrick];
         
     }
 
@@ -521,7 +526,16 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         CGPoint nodePositionInScene = [node.scene convertPoint:node.position fromNode:node.parent];
         if (nodePositionInScene.x < (0 - (node.frame.size.width/2) )   ) {
             NSLog(@"Removing brick");
+
+            
+            if (node.physicsBody.categoryBitMask == brickCategory) {
+                // decrement score if it's a good brick
+                [myScore incrementCurrentScoreBy:scoreMissedGoodBrick];
+            }
+
             [node removeFromParent];
+            
+            
             // TODO: Even though we're removing bricks, the memory usage is still going up. Maybe we need to actually destroy them?
             // this is pretty brilliant way of removing obstacles, from http://roadtonerdvana.com/2014/04/24/tapity-tapper-my-ios-flappy-bird-clone-using-sprite-kit-adding-obstacles/:
 //            [upperObstacle runAction:moveObstacle completion:^(void){

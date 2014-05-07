@@ -11,12 +11,14 @@
 // constants
 static NSString * const playerScoreFontName = @"Helvetica-Bold";
 static NSInteger const  playerScoreFontSize = 25;
+static NSInteger const  playerScoreAlignment = SKLabelHorizontalAlignmentModeRight;
 
 static NSString * const playerEventFontName = @"Helvetica-Light";
 static NSInteger const  playerEventFontSize = 35;
+static NSInteger const  playerEventAlignment = SKLabelHorizontalAlignmentModeCenter;
 
 static NSString * const playerScoreLabel = @"%i";
-static NSInteger const  playerScoreAlignment = SKLabelHorizontalAlignmentModeRight;
+
 static NSInteger const  playerScoreInitial = 0;
 
 // score color
@@ -72,7 +74,7 @@ static CGFloat const    playerEventFontColorAlpha   = 1.0; // A
 
 - (SKLabelNode *)addEventLabel {
     eventLabel = [SKLabelNode labelNodeWithFontNamed:playerEventFontName];
-    eventLabel.horizontalAlignmentMode = playerScoreAlignment;
+    eventLabel.horizontalAlignmentMode = playerEventAlignment;
     eventLabel.fontSize = playerEventFontSize;
     eventLabel.fontColor = [SKColor colorWithRed:playerEventFontColorRed green:playerEventFontColorGreen blue:playerEventFontColorBlue alpha:playerEventFontColorAlpha];
     // init the fade-out action

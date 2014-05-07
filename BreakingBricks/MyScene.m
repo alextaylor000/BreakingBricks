@@ -100,6 +100,8 @@ static const CGFloat    graphicsBallDiameter    =   27;
     SKTexture *levelOn;
     SKTexture *levelOff;
     
+    SKEmitterNode *brickDesctruction;
+    
 }
 
 
@@ -114,8 +116,26 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 }
 
 
+
 // the contact methods are being provided by the delegate
 // which was delcared in the header
+- (void)destroyBrick:(SKNode *)nodeToDestroy {
+    
+    SKEmitterNode *brickGoesBoom = [brickDesctruction copy];
+    
+    CGPoint nodePositionInScene = [nodeToDestroy.scene convertPoint:nodeToDestroy.position fromNode:nodeToDestroy.parent];
+    
+    // BOOM!
+    brickGoesBoom.position = nodePositionInScene;
+    [self addChild:brickGoesBoom];
+    brickGoesBoom.numParticlesToEmit = 30;
+    
+    [nodeToDestroy removeFromParent];
+    
+    // TODO: does this result in lots of stale references to particle emitters??
+
+}
+
 - (void)didBeginContact:(SKPhysicsContact *)contact {
     
     // impossible to predict which object is bodyA
@@ -134,7 +154,9 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
     if (notTheBall.categoryBitMask == brickCategory) {
         [self runAction:soundBrickHit];
-        [notTheBall.node removeFromParent];
+        // BOOM!
+        [self destroyBrick:notTheBall.node];
+        
 
         // update score
         [myScore incrementCurrentScoreBy:10];
@@ -144,7 +166,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     
     if (notTheBall.categoryBitMask == brickBadCategory) {
         [self runAction:soundBrickHitBad];
-        [notTheBall.node removeFromParent];
+        
+        // BOOM!
+        [self destroyBrick:notTheBall.node];
+        
         
         // update score
         [myScore incrementCurrentScoreBy:-5];
@@ -194,7 +219,11 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
     levelIndicator.fontSize = 50;
     levelIndicator.text = @".";
     levelIndicator.fontColor = [SKColor colorWithRed:0.29 green:0.29 blue:0.29 alpha:1.0];
+    levelIndicator.alpha = 0.0;
+    SKAction *fadeIn = [SKAction fadeInWithDuration:0.25];
+    
     [self addChild:levelIndicator];
+    [levelIndicator runAction:fadeIn];
     
     
     
@@ -397,6 +426,10 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
         levelOn = [SKTexture textureWithImageNamed:@"level_on"];
         levelOff = [SKTexture textureWithImageNamed:@"level_off"];
         
+        /* init particles */
+        brickDesctruction = [NSKeyedUnarchiver unarchiveObjectWithFile:[[NSBundle mainBundle]pathForResource:@"BrickDestruction" ofType:@"sks"]];
+
+        
         // background image
         SKSpriteNode *backgroundImage = [SKSpriteNode spriteNodeWithImageNamed:@"background"];
         backgroundImage.position = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
@@ -490,6 +523,13 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
             NSLog(@"Removing brick");
             [node removeFromParent];
             // TODO: Even though we're removing bricks, the memory usage is still going up. Maybe we need to actually destroy them?
+            // this is pretty brilliant way of removing obstacles, from http://roadtonerdvana.com/2014/04/24/tapity-tapper-my-ios-flappy-bird-clone-using-sprite-kit-adding-obstacles/:
+//            [upperObstacle runAction:moveObstacle completion:^(void){
+//                [upperObstacle removeFromParent];
+//            }];
+//            [lowerObstacle runAction:moveObstacle completion:^(void){
+//                [lowerObstacle removeFromParent];
+//            }];
         }
     }];
     
@@ -518,8 +558,8 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
             
             // add a vector to the ball
-            SKAction *ballFadeToOrange = [SKAction colorizeWithColor:[SKColor orangeColor] colorBlendFactor:0.75 duration:0.25];
-            SKAction *ballFadeFromOrange = [SKAction colorizeWithColor:[SKColor whiteColor] colorBlendFactor:0 duration:0.25];
+            SKAction *ballFadeToOrange = [SKAction colorizeWithColor:[SKColor orangeColor] colorBlendFactor:0.75 duration:0.15];
+            SKAction *ballFadeFromOrange = [SKAction colorizeWithColor:[SKColor whiteColor] colorBlendFactor:0 duration:0.15];
             SKAction *ballLevelsUp = [SKAction sequence:@[ballFadeToOrange, ballFadeFromOrange]];
             [ball runAction:ballLevelsUp];
             
@@ -551,7 +591,12 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
 
 
 - (void)didEvaluateActions {
+    // this could also be done with an action, too.
+    // check out http://roadtonerdvana.com/2014/04/24/tapity-tapper-my-ios-flappy-bird-clone-using-sprite-kit-adding-obstacles/
+    
+    
 
+    
     // track lastBrick's position relative to the scene
     // if lastBrick's position (its center) passes the right edge of the scene (defined by the scene width),
     // then we need to add more bricks

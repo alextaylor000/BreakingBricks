@@ -26,6 +26,8 @@
 		B959D5C9190761B000F2B039 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B959D5A4190761AF00F2B039 /* UIKit.framework */; };
 		B959D5D1190761B000F2B039 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B959D5CF190761B000F2B039 /* InfoPlist.strings */; };
 		B959D5D3190761B000F2B039 /* BreakingBricksTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B959D5D2190761B000F2B039 /* BreakingBricksTests.m */; };
+		B9674F191919E48B00B7D692 /* BrickDestruction.sks in Resources */ = {isa = PBXBuildFile; fileRef = B9674F171919E48B00B7D692 /* BrickDestruction.sks */; };
+		B9674F1A1919E48B00B7D692 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = B9674F181919E48B00B7D692 /* spark.png */; };
 		B99604001917023400171146 /* infinibrickGraphics.atlas in Resources */ = {isa = PBXBuildFile; fileRef = B99603FF1917023400171146 /* infinibrickGraphics.atlas */; };
 		B99B2FED190C254E00B773DD /* PlayerScore.m in Sources */ = {isa = PBXBuildFile; fileRef = B99B2FEC190C254E00B773DD /* PlayerScore.m */; };
 		B9B75EF2190B4D6800D28C74 /* blip.caf in Resources */ = {isa = PBXBuildFile; fileRef = B9B75EEF190B4D6800D28C74 /* blip.caf */; };
@@ -70,6 +72,8 @@
 		B959D5CE190761B000F2B039 /* BreakingBricksTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BreakingBricksTests-Info.plist"; sourceTree = "<group>"; };
 		B959D5D0190761B000F2B039 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B959D5D2190761B000F2B039 /* BreakingBricksTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BreakingBricksTests.m; sourceTree = "<group>"; };
+		B9674F171919E48B00B7D692 /* BrickDestruction.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BrickDestruction.sks; sourceTree = "<group>"; };
+		B9674F181919E48B00B7D692 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		B99603FF1917023400171146 /* infinibrickGraphics.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = infinibrickGraphics.atlas; sourceTree = "<group>"; };
 		B99B2FEB190C254E00B773DD /* PlayerScore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerScore.h; sourceTree = "<group>"; };
 		B99B2FEC190C254E00B773DD /* PlayerScore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerScore.m; sourceTree = "<group>"; };
@@ -152,6 +156,8 @@
 				B959D5B8190761AF00F2B039 /* ViewController.m */,
 				B959D5BA190761AF00F2B039 /* MyScene.h */,
 				B959D5BB190761AF00F2B039 /* MyScene.m */,
+				B9674F171919E48B00B7D692 /* BrickDestruction.sks */,
+				B9674F181919E48B00B7D692 /* spark.png */,
 				B99B2FEB190C254E00B773DD /* PlayerScore.h */,
 				B99B2FEC190C254E00B773DD /* PlayerScore.m */,
 				B9B75EF5190B517E00D28C74 /* EndScene.h */,
@@ -269,7 +275,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				B959D5AD190761AF00F2B039 /* InfoPlist.strings in Resources */,
+				B9674F1A1919E48B00B7D692 /* spark.png in Resources */,
 				B99604001917023400171146 /* infinibrickGraphics.atlas in Resources */,
+				B9674F191919E48B00B7D692 /* BrickDestruction.sks in Resources */,
 				B9B75EF2190B4D6800D28C74 /* blip.caf in Resources */,
 				B9B75EF4190B4D6800D28C74 /* gameover.caf in Resources */,
 				B9B75EF3190B4D6800D28C74 /* brickhit.caf in Resources */,

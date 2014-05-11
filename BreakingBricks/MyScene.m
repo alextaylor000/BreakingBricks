@@ -586,8 +586,12 @@ static inline CGFloat skRand(CGFloat low, CGFloat high)
             
             // I've set the ball speed to just be the levelDifficultyInterval, this may need
             // to be tweaked to get a good feeling of speed
-            CGVector myVector = CGVectorMake((100/ball.physicsBody.velocity.dx)*ballSpeed, (100/ball.physicsBody.velocity.dy)*ballSpeed);
-            [ball.physicsBody applyImpulse: myVector];
+            
+            NSLog(@"Ball's mass is %0.f", ball.physicsBody.mass);
+            [ball.physicsBody applyImpulse:CGVectorMake(0.0, 1.0)];
+            
+//            CGVector myVector = CGVectorMake((100/ball.physicsBody.velocity.dx)*ballSpeed, (100/ball.physicsBody.velocity.dy)*ballSpeed);
+//            [ball.physicsBody applyImpulse: myVector];
             NSLog(@"+ Ball is travelling at vector %0.1f, %01.f", ball.physicsBody.velocity.dx, ball.physicsBody.velocity.dy);
             
             
